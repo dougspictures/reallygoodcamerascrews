@@ -1,12 +1,20 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Really Good Camera Screws</title>
 <style>
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
 html, body {
   margin: 0;
   height: 100%;
   background: #000;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 .stage {
@@ -24,8 +32,6 @@ html, body {
   max-height: 92vh;
   touch-action: none;
   cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
@@ -38,6 +44,7 @@ html, body {
   background-position: 28.57% 48.28%;
   opacity: 1;
   transition: opacity 60ms linear;
+  pointer-events: none;
 }
 .layer.plain {
   background-image: url('not-hugging.jpg');
@@ -91,15 +98,39 @@ function hideHint() {
   hint.style.opacity = '0';
 }
 
-el.addEventListener('mousedown', function (e) { e.preventDefault(); setActive(true); hideHint(); });
-el.addEventListener('mouseup', function () { setActive(false); });
-el.addEventListener('mouseleave', function () { setActive(false); });
+function press(e) {
+  if (e.cancelable) { e.preventDefault(); }
+  setActive(true);
+  hideHint();
+}
 
-el.addEventListener('touchstart', function (e) { e.preventDefault(); setActive(true); hideHint(); }, { passive: false });
-el.addEventListener('touchend', function (e) { e.preventDefault(); setActive(false); }, { passive: false });
-el.addEventListener('touchcancel', function () { setActive(false); });
+function release(e) {
+  if (e && e.cancelable) { e.preventDefault(); }
+  setActive(false);
+}
 
-el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+var opts = { passive: false };
+
+el.addEventListener('touchstart', press, opts);
+el.addEventListener('touchend', release, opts);
+el.addEventListener('touchcancel', release, opts);
+el.addEventListener('touchmove', function (e) { if (e.cancelable) { e.preventDefault(); } }, opts);
+
+el.addEventListener('pointerdown', press, opts);
+el.addEventListener('pointerup', release, opts);
+el.addEventListener('pointercancel', release, opts);
+el.addEventListener('pointerleave', release, opts);
+
+el.addEventListener('mousedown', press, opts);
+el.addEventListener('mouseup', release, opts);
+el.addEventListener('mouseleave', release, opts);
+
+window.addEventListener('blur', function () { setActive(false); });
+
+document.addEventListener('contextmenu', function (e) { e.preventDefault(); }, opts);
+document.addEventListener('selectstart', function (e) { e.preventDefault(); }, opts);
+document.addEventListener('dragstart', function (e) { e.preventDefault(); }, opts);
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, opts);
 
 setTimeout(hideHint, 4000);
 </script>
