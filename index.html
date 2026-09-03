@@ -1,25 +1,107 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Really Good Camera Screws</title>
-  <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #000; }
-.slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; animation: fade 12s infinite; }
-.slide:nth-child(1) { background: linear-gradient(135deg, #1a1a1a, #3a3a3a); animation-delay: 0s; }
-.slide:nth-child(2) { background: linear-gradient(135deg, #2b2b2b, #555555); animation-delay: 4s; }
-.slide:nth-child(3) { background: linear-gradient(135deg, #111111, #444444); animation-delay: 8s; }
-@keyframes fade { 0% { opacity: 0; } 8% { opacity: 1; } 33% { opacity: 1; } 41% { opacity: 0; } 100% { opacity: 0; } }
-.overlay { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; padding: 24px; box-sizing: border-box; }
-h1 { font-size: clamp(28px, 5vw, 56px); letter-spacing: 0.02em; margin: 0 0 12px; font-weight: 600; }
-p { font-size: 16px; opacity: 0.7; margin: 0; }
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Really Good Camera Screws</title>
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+.stage {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.photo-wrap {
+  position: relative;
+  width: min(92vw, calc(78vh * 0.8099));
+  aspect-ratio: 1725 / 2130;
+  max-height: 92vh;
+  touch-action: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.layer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 28.57% 48.28%;
+  opacity: 1;
+  transition: opacity 60ms linear;
+}
+.layer.plain {
+  background-image: url('not-hugging.jpg');
+}
+.layer.hug {
+  background-image: url('hugging.jpg');
+  opacity: 0;
+}
+.photo-wrap.active .layer.plain {
+  opacity: 0;
+}
+.photo-wrap.active .layer.hug {
+  opacity: 1;
+}
+.hint {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
 </style>
-  </head>
-  <body>
-  <div class="slide"></div>
-  <div class="slide"></div>
-  <div class="slide"></div>
-  <div class="overlay">
-  <h1>Really Good Camera Screws</h1>
-  <p>Site live &mdash; photos loading soon.</p>
+</head>
+<body>
+<div class="stage">
+  <div class="photo-wrap" id="photo">
+    <div class="layer plain"></div>
+    <div class="layer hug"></div>
+    <div class="hint" id="hint">press &amp; hold</div>
   </div>
-  </body>
-  </html>
+</div>
+<script>
+var el = document.getElementById('photo');
+var hint = document.getElementById('hint');
+
+function setActive(on) {
+  if (on) {
+    el.classList.add('active');
+  } else {
+    el.classList.remove('active');
+  }
+}
+
+function hideHint() {
+  hint.style.opacity = '0';
+}
+
+el.addEventListener('mousedown', function (e) { e.preventDefault(); setActive(true); hideHint(); });
+el.addEventListener('mouseup', function () { setActive(false); });
+el.addEventListener('mouseleave', function () { setActive(false); });
+
+el.addEventListener('touchstart', function (e) { e.preventDefault(); setActive(true); hideHint(); }, { passive: false });
+el.addEventListener('touchend', function (e) { e.preventDefault(); setActive(false); }, { passive: false });
+el.addEventListener('touchcancel', function () { setActive(false); });
+
+el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+setTimeout(hideHint, 4000);
+</script>
+</body>
+</html>
